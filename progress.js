@@ -1,6 +1,12 @@
 const fs = require('fs');
 const csv = require('@fast-csv/parse');
 
+const { format } = require('@fast-csv/format');
+const csvProgressStream = format({ headers: true });
+const progressData = fs.createWriteStream('progressdata.csv')
+
+csvProgressStream.pipe(progressData).on('end', () => console.log('done'));
+
     let lLProgress = {}
     let lincProgress = {}
     let l1Progress = {}
@@ -45,7 +51,7 @@ const csv = require('@fast-csv/parse');
         let subject = currentProgress['subject']
         let progressAppAndSubjectKey = `${app} - ${subject}`
        
-        
+
         fs.createReadStream(currentStudentSessionGoalsFile)
         .pipe(csv.parse({headers: true}))
         .on('error', error => console.error(error))
@@ -120,24 +126,57 @@ const csv = require('@fast-csv/parse');
        console.log('LL - Did not complete session goals:', lLIncomplete)
        console.log(100*(lLComplete/(lLComplete+lLIncomplete)), '% completed session goals in LL')
 
+       let lLCompleteObj = {
+           level: 0,
+           percent_reached_goal: 100*(lLComplete/(lLComplete+lLIncomplete))
+       }
+
        //console.log(lincProgress)
        console.log('Linc - Completed session goals:', lincComplete)
        console.log('Linc - Did not complete session goals:', lincIncomplete)
        console.log(100*(lincComplete/(lincComplete+lincIncomplete)), '% completed session goals in Linc')
+
+       let lincCompleteObj = {
+        level: 0.5,
+        percent_reached_goal: 100*(lincComplete/(lincComplete+lincIncomplete))
+    }
 
        //console.log(l1Progress)
        console.log('L1 - Completed session goals:', l1Complete)
        console.log('L1 - Did not complete session goals:', l1Incomplete)
        console.log(100*(l1Complete/(l1Complete+l1Incomplete)), '% completed session goals in L1')
 
+       let lOneCompleteObj = {
+        level: 1,
+        percent_reached_goal: 100*(l1Complete/(l1Complete+l1Incomplete))
+    }
+
        //console.log(l2Progress)
        console.log('L2 - Completed session goals:', l2Complete)
        console.log('L2 - Did not complete session goals:', l2Incomplete)
        console.log(100*(l2Complete/(l2Complete+l2Incomplete)), '% completed session goals in L2')
 
+       let lTwoCompleteObj = {
+        level: 2,
+        percent_reached_goal: 100*(l2Complete/(l2Complete+l2Incomplete))
+    }
+
        //console.log(l3Progress)
        console.log('L3 - Completed session goals:', l3Complete)
        console.log('L3 - Did not complete session goals:', l3Incomplete)
        console.log(100*(l3Complete/(l3Complete+l3Incomplete)), '% completed session goals in L3')
+
+       let lThreeCompleteObj = {
+        level: 3,
+        percent_reached_goal: 100*(l3Complete/(l3Complete+l3Incomplete))
+    }
+
+       csvProgressStream.write(lLCompleteObj)
+       csvProgressStream.write(lincCompleteObj)
+       csvProgressStream.write(lOneCompleteObj)
+       csvProgressStream.write(lTwoCompleteObj)
+       csvProgressStream.write(lThreeCompleteObj)
+
+       csvProgressStream.end()
     });
 
